@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Sudoku": {
+      "commandName": "Project",
+      "commandLineArgs": "p01.txt 1"
+    }
+  }
+}
