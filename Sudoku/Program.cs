@@ -134,10 +134,10 @@ class Solver
         switch (dataStructureType)
         {
             case 1:
-                SolveWithStackClass(sudoku, stack);
+                SolveUsingStack(sudoku, stack);
                 break;
             case 2:
-                SolveWithLinkedListQueue(sudoku, queue);
+                SolveUsingLinkedListQueue(sudoku, queue);
                 break;
             default:
                 Console.WriteLine("Invalid data structure type.");
@@ -145,7 +145,7 @@ class Solver
         }
     }
 
-    static void SolveWithStackClass(Sudoku initialSudoku, Stack<Sudoku> stack)
+    static void SolveUsingStack(Sudoku initialSudoku, Stack<Sudoku> stack)
     {
         stack.Push(initialSudoku);
 
@@ -155,7 +155,7 @@ class Solver
 
             if (currentSudoku.IsBoardSolved())
             {
-                Console.WriteLine("Sudoku Solved!");
+                Console.WriteLine("The given Sudoku board has been successfully Solved! Here is the outcome: ");
                 currentSudoku.PrintBoard();
                 return;
             }
@@ -174,12 +174,12 @@ class Solver
             }
         }
 
-        Console.WriteLine("No solution found for the Sudoku puzzle.");
+        Console.WriteLine("No solution found.");
     }
 
-    static void SolveWithLinkedListQueue(Sudoku initialSudoku, Queue<Sudoku> queue)
+    static void SolveUsingLinkedListQueue(Sudoku initialSudokuBoard, Queue<Sudoku> queue)
     {
-        queue.Enqueue(initialSudoku);
+        queue.Enqueue(initialSudokuBoard);
 
         while (queue.Count > 0)
         {
@@ -187,15 +187,13 @@ class Solver
 
             if (currentSudoku.IsBoardSolved())
             {
-                Console.WriteLine("Sudoku Solved!");
+                Console.WriteLine("The given Sudoku board has been successfully solved! Here is the outcome: ");
                 currentSudoku.PrintBoard();
                 return;
             }
 
-            // Find the first empty cell
             int[] emptyCell = FindEmptyCell(currentSudoku);
 
-            // Try placing numbers in the empty cell
             for (int num = 1; num <= 9; num++)
             {
                 if (currentSudoku.IsValidMove(emptyCell[0], emptyCell[1], num))
@@ -208,12 +206,11 @@ class Solver
             }
         }
 
-        Console.WriteLine("No solution found for the Sudoku puzzle.");
+        Console.WriteLine("No solution found.");
     }
 
     static int[] FindEmptyCell(Sudoku sudoku)
     {
-        // Find the first empty cell in the Sudoku grid
         for (int i = 0; i < 9; i++)
         {
             for (int j = 0; j < 9; j++)
@@ -224,6 +221,6 @@ class Solver
                 }
             }
         }
-        return null; // All cells are filled
+        return null; 
     }
 }
