@@ -5,92 +5,86 @@ using System.IO;
 
 class Sudoku
 {
-    private int[,] grid;
+    private int[,] board;
 
-    public Sudoku(int[,] initialGrid)
+    public Sudoku(int[,] initialBoard)
     {
-        grid = initialGrid;
-    }
-
-    public bool IsSolved()
-    {
-        // Check if the Sudoku is solved
-        for (int i = 0; i < 9; i++)
-        {
-            for (int j = 0; j < 9; j++)
-            {
-                if (grid[i, j] == 0)
-                {
-                    return false; // There is an empty cell
-                }
-            }
-        }
-        return true; // All cells are filled
+        board = initialBoard;
     }
 
     public bool IsValidMove(int row, int col, int num)
     {
-        // Check if placing 'num' in the specified position is a valid move
 
-        // Check the row
         for (int i = 0; i < 9; i++)
         {
-            if (grid[row, i] == num)
+            if (board[row, i] == num)
             {
-                return false; // Invalid move
+                return false; 
             }
         }
 
-        // Check the column
         for (int i = 0; i < 9; i++)
         {
-            if (grid[i, col] == num)
+            if (board[i, col] == num)
             {
-                return false; // Invalid move
+                return false; 
             }
         }
 
-        // Check the 3x3 square
-        int startRow = row - row % 3;
-        int startCol = col - col % 3;
+        int initalRow = row - row % 3;
+        int initalCol = col - col % 3;
         for (int i = 0; i < 3; i++)
         {
             for (int j = 0; j < 3; j++)
             {
-                if (grid[startRow + i, startCol + j] == num)
+                if (board[initalRow + i, initalCol + j] == num)
                 {
-                    return false; // Invalid move
+                    return false; 
                 }
             }
         }
 
-        return true; // Valid move
+        return true; 
     }
 
-    public void PrintGrid()
+    public int[,] CloneBoard()
     {
-        // Print the current state of the grid
+        int[,] clonedBoard = new int[9, 9];
         for (int i = 0; i < 9; i++)
         {
             for (int j = 0; j < 9; j++)
             {
-                Console.Write(grid[i, j] + " ");
+                clonedBoard[i, j] = board[i, j];
+            }
+        }
+        return clonedBoard;
+    }
+
+    public bool IsBoardSolved()
+    {
+        for (int i = 0; i < 9; i++)
+        {
+            for (int j = 0; j < 9; j++)
+            {
+                if (board[i, j] == 0)
+                {
+                    return false; 
+                }
+            }
+        }
+        return true; 
+    }
+
+    public void PrintBoard()
+    {
+        for (int i = 0; i < 9; i++)
+        {
+            for (int j = 0; j < 9; j++)
+            {
+                Console.Write(board[i, j] + " ");
             }
             Console.WriteLine();
         }
-    }
-
-    public int[,] CloneGrid()
-    {
-        int[,] clonedGrid = new int[9, 9];
-        for (int i = 0; i < 9; i++)
-        {
-            for (int j = 0; j < 9; j++)
-            {
-                clonedGrid[i, j] = grid[i, j];
-            }
-        }
-        return clonedGrid;
     }
 }
 
@@ -98,20 +92,42 @@ class Solver
 {
     static void Main(string[] args)
     {
-        if (args.Length < 2)
-        {
-            Console.WriteLine("Usage: Solver <filename> <dataStructureType>");
-            return;
-        }
-
         string filename = args[0];
         int dataStructureType = int.Parse(args[1]);
 
-        // Read Sudoku puzzle from file
-        int[,] initialGrid = ReadSudokuFromFile(filename);
-        Sudoku sudoku = new Sudoku(initialGrid);
+        static int[,] FileReader(string filename)
+        {
+            int[,] sudokuBoard = new int[9, 9];
 
-        // Choose data structure based on input
+            try
+            {
+                using (StreamReader reader = new StreamReader(filename))
+                {
+                    for (int i = 0; i < 9; i++)
+                    {
+                        string line = reader.ReadLine();
+
+                        string[] values = line.Split(' ');
+
+                        for (int j = 0; j < 9; j++)
+                        {
+                            sudokuBoard[i, j] = int.Parse(values[j]);
+                        }
+                    }
+                }
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error reading file: {e.Message}");
+            }
+
+            return sudokuBoard;
+        }
+
+        int[,] initialBoard = FileReader(filename);
+        Sudoku sudoku = new Sudoku(initialBoard);
+
         Queue<Sudoku> queue = new Queue<Sudoku>();
         Stack<Sudoku> stack = new Stack<Sudoku>();
 
@@ -137,25 +153,22 @@ class Solver
         {
             Sudoku currentSudoku = stack.Pop();
 
-            // Implement solving logic here
-            if (currentSudoku.IsSolved())
+            if (currentSudoku.IsBoardSolved())
             {
                 Console.WriteLine("Sudoku Solved!");
-                currentSudoku.PrintGrid();
+                currentSudoku.PrintBoard();
                 return;
             }
 
-            // Find the first empty cell
             int[] emptyCell = FindEmptyCell(currentSudoku);
 
-            // Try placing numbers in the empty cell
             for (int num = 1; num <= 9; num++)
             {
                 if (currentSudoku.IsValidMove(emptyCell[0], emptyCell[1], num))
                 {
-                    int[,] newGrid = currentSudoku.CloneGrid();
-                    newGrid[emptyCell[0], emptyCell[1]] = num;
-                    Sudoku newSudoku = new Sudoku(newGrid);
+                    int[,] newBoard = currentSudoku.CloneBoard();
+                    newBoard[emptyCell[0], emptyCell[1]] = num;
+                    Sudoku newSudoku = new Sudoku(newBoard);
                     stack.Push(newSudoku);
                 }
             }
@@ -172,11 +185,10 @@ class Solver
         {
             Sudoku currentSudoku = queue.Dequeue();
 
-            // Implement solving logic here
-            if (currentSudoku.IsSolved())
+            if (currentSudoku.IsBoardSolved())
             {
                 Console.WriteLine("Sudoku Solved!");
-                currentSudoku.PrintGrid();
+                currentSudoku.PrintBoard();
                 return;
             }
 
@@ -188,9 +200,9 @@ class Solver
             {
                 if (currentSudoku.IsValidMove(emptyCell[0], emptyCell[1], num))
                 {
-                    int[,] newGrid = currentSudoku.CloneGrid();
-                    newGrid[emptyCell[0], emptyCell[1]] = num;
-                    Sudoku newSudoku = new Sudoku(newGrid);
+                    int[,] newBoard = currentSudoku.CloneBoard();
+                    newBoard[emptyCell[0], emptyCell[1]] = num;
+                    Sudoku newSudoku = new Sudoku(newBoard);
                     queue.Enqueue(newSudoku);
                 }
             }
@@ -206,38 +218,12 @@ class Solver
         {
             for (int j = 0; j < 9; j++)
             {
-                if (sudoku.CloneGrid()[i, j] == 0)
+                if (sudoku.CloneBoard()[i, j] == 0)
                 {
                     return new int[] { i, j };
                 }
             }
         }
         return null; // All cells are filled
-    }
-
-    static int[,] ReadSudokuFromFile(string filename)
-    {
-        int[,] sudokuGrid = new int[9, 9];
-
-        try
-        {
-            string[] lines = File.ReadAllLines(filename);
-
-            for (int i = 0; i < 9; i++)
-            {
-                string[] values = lines[i].Split(' ');
-
-                for (int j = 0; j < 9; j++)
-                {
-                    sudokuGrid[i, j] = int.Parse(values[j]);
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine($"Error reading file: {e.Message}");
-        }
-
-        return sudokuGrid;
     }
 }

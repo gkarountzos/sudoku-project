@@ -2,7 +2,7 @@
   "profiles": {
     "Sudoku": {
       "commandName": "Project",
-      "commandLineArgs": "p01.txt 1"
+      "commandLineArgs": "p03.txt 1"
     }
   }
 }
