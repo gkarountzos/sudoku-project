@@ -90,60 +90,6 @@ class Sudoku
 
 class Solver
 {
-    static void Main(string[] args)
-    {
-        string filename = args[0];
-        int dataStructureType = int.Parse(args[1]);
-
-        static int[,] FileReader(string filename)
-        {
-            int[,] sudokuBoard = new int[9, 9];
-
-            try
-            {
-                using (StreamReader reader = new StreamReader(filename))
-                {
-                    for (int i = 0; i < 9; i++)
-                    {
-                        string line = reader.ReadLine();
-
-                        string[] values = line.Split(' ');
-
-                        for (int j = 0; j < 9; j++)
-                        {
-                            sudokuBoard[i, j] = int.Parse(values[j]);
-                        }
-                    }
-                }
-            }
-
-            catch (Exception e)
-            {
-                Console.WriteLine($"Error reading file: {e.Message}");
-            }
-
-            return sudokuBoard;
-        }
-
-        int[,] initialBoard = FileReader(filename);
-        Sudoku sudoku = new Sudoku(initialBoard);
-
-        Queue<Sudoku> queue = new Queue<Sudoku>();
-        Stack<Sudoku> stack = new Stack<Sudoku>();
-
-        switch (dataStructureType)
-        {
-            case 1:
-                SolveUsingStack(sudoku, stack);
-                break;
-            case 2:
-                SolveUsingLinkedListQueue(sudoku, queue);
-                break;
-            default:
-                Console.WriteLine("Invalid data structure type.");
-                break;
-        }
-    }
 
     static void SolveUsingStack(Sudoku initialSudoku, Stack<Sudoku> stack)
     {
@@ -222,5 +168,60 @@ class Solver
             }
         }
         return null; 
+    }
+
+    static void Main(string[] args)
+    {
+        string filename = args[0];
+        int dataStructureType = int.Parse(args[1]);
+
+        static int[,] FileReader(string filename)
+        {
+            int[,] sudokuBoard = new int[9, 9];
+
+            try
+            {
+                using (StreamReader reader = new StreamReader(filename))
+                {
+                    for (int i = 0; i < 9; i++)
+                    {
+                        string line = reader.ReadLine();
+
+                        string[] values = line.Split(' ');
+
+                        for (int j = 0; j < 9; j++)
+                        {
+                            sudokuBoard[i, j] = int.Parse(values[j]);
+                        }
+                    }
+                }
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error reading file: {e.Message}");
+            }
+
+            return sudokuBoard;
+        }
+
+        int[,] initialBoard = FileReader(filename);
+        Sudoku sudoku = new Sudoku(initialBoard);
+
+        Queue<Sudoku> queue = new Queue<Sudoku>();
+        Stack<Sudoku> stack = new Stack<Sudoku>();
+
+        switch (dataStructureType)
+        {
+            case 1:
+                SolveUsingStack(sudoku, stack);
+                break;
+            case 2:
+                SolveUsingLinkedListQueue(sudoku, queue);
+                break;
+            default:
+                Console.WriteLine("Invalid data structure type.");
+                break;
+        }
     }
 }
