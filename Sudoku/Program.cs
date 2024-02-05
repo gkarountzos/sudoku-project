@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 
 class Sudoku
@@ -47,17 +45,17 @@ class Sudoku
         return true; 
     }
 
-    public int[,] CloneBoard()
+    public int[,] ExpendableBoard()
     {
-        int[,] clonedBoard = new int[9, 9];
+        int[,] expendableBoard = new int[9, 9];
         for (int i = 0; i < 9; i++)
         {
             for (int j = 0; j < 9; j++)
             {
-                clonedBoard[i, j] = board[i, j];
+                expendableBoard[i, j] = board[i, j];
             }
         }
-        return clonedBoard;
+        return expendableBoard;
     }
 
     public bool IsBoardSolved()
@@ -90,90 +88,94 @@ class Sudoku
 
 class Solver
 {
-
-    static void SolveUsingStack(Sudoku initialSudoku, Stack<Sudoku> stack)
-    {
-        stack.Push(initialSudoku);
-
-        while (stack.Count > 0)
-        {
-            Sudoku currentSudoku = stack.Pop();
-
-            if (currentSudoku.IsBoardSolved())
-            {
-                Console.WriteLine("The given Sudoku board has been successfully Solved! Here is the outcome: ");
-                currentSudoku.PrintBoard();
-                return;
-            }
-
-            int[] emptyCell = FindEmptyCell(currentSudoku);
-
-            for (int num = 1; num <= 9; num++)
-            {
-                if (currentSudoku.IsValidMove(emptyCell[0], emptyCell[1], num))
-                {
-                    int[,] newBoard = currentSudoku.CloneBoard();
-                    newBoard[emptyCell[0], emptyCell[1]] = num;
-                    Sudoku newSudoku = new Sudoku(newBoard);
-                    stack.Push(newSudoku);
-                }
-            }
-        }
-
-        Console.WriteLine("No solution found.");
-    }
-
-    static void SolveUsingLinkedListQueue(Sudoku initialSudokuBoard, Queue<Sudoku> queue)
-    {
-        queue.Enqueue(initialSudokuBoard);
-
-        while (queue.Count > 0)
-        {
-            Sudoku currentSudoku = queue.Dequeue();
-
-            if (currentSudoku.IsBoardSolved())
-            {
-                Console.WriteLine("The given Sudoku board has been successfully solved! Here is the outcome: ");
-                currentSudoku.PrintBoard();
-                return;
-            }
-
-            int[] emptyCell = FindEmptyCell(currentSudoku);
-
-            for (int num = 1; num <= 9; num++)
-            {
-                if (currentSudoku.IsValidMove(emptyCell[0], emptyCell[1], num))
-                {
-                    int[,] newBoard = currentSudoku.CloneBoard();
-                    newBoard[emptyCell[0], emptyCell[1]] = num;
-                    Sudoku newSudoku = new Sudoku(newBoard);
-                    queue.Enqueue(newSudoku);
-                }
-            }
-        }
-
-        Console.WriteLine("No solution found.");
-    }
-
     static int[] FindEmptyCell(Sudoku sudoku)
     {
         for (int i = 0; i < 9; i++)
         {
             for (int j = 0; j < 9; j++)
             {
-                if (sudoku.CloneBoard()[i, j] == 0)
+                if (sudoku.ExpendableBoard()[i, j] == 0)
                 {
                     return new int[] { i, j };
                 }
             }
         }
-        return null; 
+        return null;
     }
 
+    static void SolveUsingStack(Sudoku initialBoard, Stack<Sudoku> stack)
+    {
+        stack.Push(initialBoard);
+
+        while (stack.Count > 0)
+        {
+            Sudoku currentBoard = stack.Pop();
+
+            if (currentBoard.IsBoardSolved())
+            {
+                Console.WriteLine("The given Sudoku board has been successfully solved using stack! Here is the outcome: ");
+                currentBoard.PrintBoard();
+                return;
+            }
+
+            int[] emptyCell = FindEmptyCell(currentBoard);
+
+            for (int num = 1; num <= 9; num++)
+            {
+                if (currentBoard.IsValidMove(emptyCell[0], emptyCell[1], num))
+                {
+                    int[,] newBoard = currentBoard.ExpendableBoard();
+                    newBoard[emptyCell[0], emptyCell[1]] = num;
+                    Sudoku newSudokuBoard = new Sudoku(newBoard);
+                    stack.Push(newSudokuBoard);
+                }
+            }
+        }
+
+        Console.WriteLine("No solution found.");
+    }
+
+    static void SolveUsingLinkedListQueue(Sudoku initialBoard, Queue<Sudoku> queue)
+    {
+        queue.Enqueue(initialBoard);
+
+        while (queue.Count > 0)
+        {
+            Sudoku currentBoard = queue.Dequeue();
+
+            if (currentBoard.IsBoardSolved())
+            {
+                Console.WriteLine("The given Sudoku board has been successfully solved using queues! Here is the outcome: ");
+                currentBoard.PrintBoard();
+                return;
+            }
+
+            int[] emptyCell = FindEmptyCell(currentBoard);
+
+            for (int num = 1; num <= 9; num++)
+            {
+                if (currentBoard.IsValidMove(emptyCell[0], emptyCell[1], num))
+                {
+                    int[,] newBoard = currentBoard.ExpendableBoard();
+                    newBoard[emptyCell[0], emptyCell[1]] = num;
+                    Sudoku newSudokuBoard = new Sudoku(newBoard);
+                    queue.Enqueue(newSudokuBoard);
+                }
+            }
+        }
+
+        Console.WriteLine("No solution found.");
+    }
     static void Main(string[] args)
     {
         string filename = args[0];
         int dataStructureType = int.Parse(args[1]);
+
+        if (dataStructureType != 1 && dataStructureType != 2)
+        {
+            Console.WriteLine("Invalid data structure type. Please choose 1 for Stack or 2 for Queue.");
+            return;
+        }
 
         static int[,] FileReader(string filename)
         {
@@ -188,6 +190,11 @@ class Solver
                         string line = reader.ReadLine();
 
                         string[] values = line.Split(' ');
+                        if (values.Length != 9)
+                        {
+                            Console.WriteLine($"Error: Line {i + 1} does not contain exactly 9 integers separated by a space.");
+                            return null; 
+                        }
 
                         for (int j = 0; j < 9; j++)
                         {
@@ -206,7 +213,7 @@ class Solver
         }
 
         int[,] initialBoard = FileReader(filename);
-        Sudoku sudoku = new Sudoku(initialBoard);
+        Sudoku board = new Sudoku(initialBoard);
 
         Queue<Sudoku> queue = new Queue<Sudoku>();
         Stack<Sudoku> stack = new Stack<Sudoku>();
@@ -214,13 +221,13 @@ class Solver
         switch (dataStructureType)
         {
             case 1:
-                SolveUsingStack(sudoku, stack);
+                SolveUsingStack(board, stack);
                 break;
             case 2:
-                SolveUsingLinkedListQueue(sudoku, queue);
+                SolveUsingLinkedListQueue(board, queue);
                 break;
             default:
-                Console.WriteLine("Invalid data structure type.");
+                Console.WriteLine("Incorrect data type.");
                 break;
         }
     }
