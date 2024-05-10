@@ -1,8 +1,8 @@
-Sudoku Solver
+# Sudoku Solver
 
 This C# program offers a solution to the classic Sudoku puzzle by employing two different data structures: a stack and a queue. Sudoku is a logic-based, combinatorial number-placement puzzle, where the objective is to fill a 9x9 grid with digits so that each column, each row, and each of the nine 3x3 subgrids that compose the grid (also called "boxes", "blocks", or "regions") contain all of the digits from 1 to 9.
 
-Usage
+## Usage
 
 To use this program, follow these steps:
 
@@ -20,7 +20,7 @@ To use this program, follow these steps:
 
 3. View the Solution: The program will output the solution to the console.
 
-Features
+## Features
 
 1. Sudoku Class
 
